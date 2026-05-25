@@ -1,0 +1,55 @@
+services:
+  elasticmq:
+    image: softwaremill/elasticmq-native:latest
+    container_name: swarm-elasticmq
+    ports:
+      - "9324:9324"
+      - "9325:9325"
+    restart: unless-stopped
+    networks:
+      - swarm-net
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: swarm-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - swarm-net
+
+    # =========================================================================
+    # SUPORTE A GPU NVIDIA  —  desativado por padrão.
+    #
+    # Para HABILITAR (recomendado p/ Phi-4 14B; CPU funciona mas é ~10x lento):
+    #   1. Tenha o nvidia-container-toolkit instalado e configurado no host.
+    #      (Em Windows: Docker Desktop + WSL2 + driver NVIDIA recente.)
+    #   2. Descomente o bloco `deploy:` abaixo.
+    #   3. Rode novamente `docker compose up -d`.
+    #
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    # =========================================================================
+
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+
+volumes:
+  ollama_models:
+    name: swarm_ollama_models
+
+networks:
+  swarm-net:
+    name: swarm-net
+    driver: bridge

@@ -1,0 +1,36 @@
+# Exemplo de RunPlan. O Master lê este arquivo e materializa as mensagens
+# que vão para tasks.queue. Sem código aqui — apenas configuração declarativa.
+
+run:
+  id: "exp-001"
+  benchmark: "gsm8k"
+  subset_size: 50
+  seed: 42
+
+model:
+  provider: "ollama"
+  endpoint: "http://ollama:11434"
+  name: "phi4"
+  temperature: 0.7
+
+strategies:
+  - name: "zero_shot"
+    prompt_id: "zs.v1"
+    k_samples: 1
+  - name: "chain_of_thought"
+    prompt_id: "cot.v1"
+    k_samples: 1
+  - name: "self_consistency"
+    prompt_id: "cot.v1"
+    k_samples: 5
+
+resilience:
+  inference_max_retries: 3
+  inference_backoff_base_s: 2
+  inference_backoff_jitter: true
+  sqs_max_receive_count: 3
+
+workers:
+  count: 4
+  poll_wait_seconds: 10
+  visibility_timeout_seconds: 120

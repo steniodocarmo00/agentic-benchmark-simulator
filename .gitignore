@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+.env
+.env.local
+runs/*/
+!runs/.gitkeep
+benchmarks/gsm8k/*.jsonl
+!benchmarks/gsm8k/.gitkeep
+.DS_Store
+*.log
+.idea/
+.vscode/
